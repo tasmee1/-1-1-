@@ -1,0 +1,40 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+  background: #e9f6ff; /* سماوي فاتح جدًا */
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #1e3358;
+}
+
+button {
+  padding: 12px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  background: #1e3358; /* كحلي */
+  color: #fff;
+}
+
+button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+#resultBox {
+  margin-top: 25px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+#logo {
+  width: 120px;
+  margin: 15px auto;
+  display: block;
+}
