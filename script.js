@@ -2,6 +2,7 @@ let mediaRecorder;
 let audioChunks = [];
 let audioURL;
 
+// الحصول على العناصر من HTML
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
 const listenBtn = document.getElementById('listenBtn');
@@ -10,11 +11,11 @@ const checkPopup = document.getElementById('checkPopup');
 const yesBtn = document.getElementById('yesBtn');
 const noBtn = document.getElementById('noBtn');
 
-// الحالة الأولية
-stopBtn.style.display = "none";
-listenBtn.disabled = true;
+// الحالة الابتدائية
+stopBtn.style.display = "none";   // زر الإيقاف مخفي بالبداية
+listenBtn.disabled = true;        // زر الاستماع معطل بالبداية
 
-// --- ابدأ التسميع ---
+// --- زر ابدأي التسميع ---
 startBtn.addEventListener('click', async () => {
   resultBox.textContent = "";
   audioChunks = [];
@@ -24,8 +25,8 @@ startBtn.addEventListener('click', async () => {
     mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.start();
 
-    stopBtn.style.display = "inline-block";  // إظهار زر الإيقاف
-    listenBtn.disabled = true;
+    stopBtn.style.display = "inline-block"; // إظهار زر الإيقاف
+    listenBtn.disabled = true;              // التأكد من تعطيل زر الاستماع أثناء التسجيل
 
     mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
 
@@ -33,23 +34,23 @@ startBtn.addEventListener('click', async () => {
       const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
       audioURL = URL.createObjectURL(audioBlob);
 
-      stopBtn.style.display = "none";       // إخفاء زر الإيقاف
-      listenBtn.disabled = false;           // تفعيل زر الاستماع
+      stopBtn.style.display = "none";      // إخفاء زر الإيقاف بعد التوقف
+      listenBtn.disabled = false;          // تفعيل زر الاستماع
     };
 
   } catch (error) {
-    alert("المايكروفون غير مفعل! الرجاء السماح بالتطبيق.");
+    alert("المايكروفون غير مفعل! الرجاء السماح للتطبيق.");
   }
 });
 
-// --- إيقاف التسجيل ---
+// --- زر إيقاف التسجيل ---
 stopBtn.addEventListener('click', () => {
   if (mediaRecorder && mediaRecorder.state === "recording") {
     mediaRecorder.stop();
   }
 });
 
-// --- الاستماع للتسجيل ---
+// --- زر الاستماع للتسجيل ---
 listenBtn.addEventListener('click', () => {
   if (!audioURL) return;
 
@@ -61,13 +62,13 @@ listenBtn.addEventListener('click', () => {
   };
 });
 
-// --- زر نعم ---
+// --- زر نعم بعد السؤال ---
 yesBtn.addEventListener('click', () => {
   resultBox.textContent = "ما شاء الله! تسميعك صحيح 🌸";
   checkPopup.style.display = "none";
 });
 
-// --- زر لا ---
+// --- زر لا بعد السؤال ---
 noBtn.addEventListener('click', () => {
   resultBox.textContent = "كل مرة تعيدي فيها التسميع تقوّي حفظك 💪";
   checkPopup.style.display = "none";
