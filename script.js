@@ -1,12 +1,20 @@
+// تعريف العناصر
+const startBtn = document.getElementById('startBtn');      // ابدئي التسميع
+const stopBtn = document.getElementById('stopBtn');        // إيقاف التسجيل
+const listenBtn = document.getElementById('listenBtn');    // اسمعي تلاوتك
+const resultBox = document.getElementById('resultBox');
+const checkPopup = document.getElementById('checkPopup');  // السؤال بعد الاستماع
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+
 let mediaRecorder;
 let audioChunks = [];
 let audioURL;
 
-const startBtn = document.getElementById('startBtn');
-const listenBtn = document.getElementById('listenBtn');
-const resultBox = document.getElementById('resultBox');
+stopBtn.style.display = "none"; // إخفاء زر الإيقاف بالبداية
+listenBtn.disabled = true;      // زر الاستماع معطل بالبداية
 
-// بدء التسميع
+// ----------------- ابدأي التسميع ------------------
 startBtn.addEventListener('click', async () => {
   resultBox.textContent = "";
   audioChunks = [];
@@ -16,54 +24,56 @@ startBtn.addEventListener('click', async () => {
     mediaRecorder = new MediaRecorder(stream);
 
     mediaRecorder.start();
-    startBtn.textContent = "جاري التسجيل... اضغطي هنا لإيقافه";
-    startBtn.disabled = false; // يمكنهم الضغط لإيقاف التسجيل
+
+    startBtn.disabled = true;
+    stopBtn.style.display = "inline-block";  // إظهار زر الإيقاف
+    listenBtn.disabled = true;
 
     mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
 
     mediaRecorder.onstop = () => {
       const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
       audioURL = URL.createObjectURL(audioBlob);
-      listenBtn.disabled = false;
-      startBtn.textContent = "ابدئي التسميع";
-      alert("تم تسجيل تلاوتك! يمكنك الآن الاستماع.");
-      
-      // إعادة تعيين الحدث للضغط لإعادة التسجيل في المستقبل
-      startBtn.onclick = startTasmii;
-    };
 
-    // السماح للمستخدم بإيقاف التسجيل عند الضغط على نفس الزر
-    startBtn.onclick = () => {
-      if (mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
-      }
+      startBtn.disabled = false;
+      stopBtn.style.display = "none";       // إخفاء زر الإيقاف
+      listenBtn.disabled = false;           // تفعيل زر الاستماع
     };
 
   } catch (error) {
-    alert("الميكروفون غير مفعل! الرجاء السماح للتطبيق باستخدامه.");
+    alert("المايكروفون غير مسموح! الرجاء تفعيل الإذن.");
   }
 });
 
-// الاستماع للتسجيل
+// ----------------- إيقاف التسجيل ------------------
+stopBtn.addEventListener('click', () => {
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    mediaRecorder.stop();
+  }
+});
+
+// ----------------- الاستماع للتسجيل ------------------
 listenBtn.addEventListener('click', () => {
   if (!audioURL) return;
+
   const audio = new Audio(audioURL);
   audio.play();
 
   audio.onended = () => {
-    const correct = confirm("هل كان تسميعك صحيحًا؟");
-
-    if (correct) {
-      resultBox.textContent = "ما شاء الله! تسميعك صحيح 🌸";
-    } else {
-      resultBox.textContent = "حاولي مرة أخرى من البداية";
-      listenBtn.disabled = true;
-      audioURL = null;
-    }
+    checkPopup.style.display = "block"; // إظهار السؤال بعد الاستماع
   };
 });
 
-// إعادة استخدام الدالة عند إعادة الضغط على زر التسميع مستقبلاً
-function startTasmii() {
-  startBtn.click();
-}
+// ----------------- زر نعم ------------------
+yesBtn.addEventListener('click', () => {
+  resultBox.textContent = "ما شاء الله! تسميعك صحيح 🌸";
+  checkPopup.style.display = "none";
+});
+
+// ----------------- زر لا ------------------
+noBtn.addEventListener('click', () => {
+  resultBox.textContent = "كل مرة تعيدي فيها التسميع تقوّي حفظك 💪";
+  checkPopup.style.display = "none";
+  listenBtn.disabled = true;
+  audioURL = null;
+});
