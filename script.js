@@ -1,4 +1,7 @@
-// تعريف العناصر
+let mediaRecorder;
+let audioChunks = [];
+let audioURL;
+
 const startBtn = document.getElementById('startBtn');      // ابدئي التسميع
 const stopBtn = document.getElementById('stopBtn');        // إيقاف التسجيل
 const listenBtn = document.getElementById('listenBtn');    // اسمعي تلاوتك
@@ -7,14 +10,11 @@ const checkPopup = document.getElementById('checkPopup');  // السؤال بع�
 const yesBtn = document.getElementById('yesBtn');
 const noBtn = document.getElementById('noBtn');
 
-let mediaRecorder;
-let audioChunks = [];
-let audioURL;
+// الحالة الأولية
+stopBtn.style.display = "none";
+listenBtn.disabled = true;
 
-stopBtn.style.display = "none"; // إخفاء زر الإيقاف بالبداية
-listenBtn.disabled = true;      // زر الاستماع معطل بالبداية
-
-// ----------------- ابدأي التسميع ------------------
+// بدء التسجيل
 startBtn.addEventListener('click', async () => {
   resultBox.textContent = "";
   audioChunks = [];
@@ -22,11 +22,10 @@ startBtn.addEventListener('click', async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder = new MediaRecorder(stream);
-
     mediaRecorder.start();
 
-    startBtn.disabled = true;
-    stopBtn.style.display = "inline-block";  // إظهار زر الإيقاف
+    // إظهار زر الإيقاف فقط
+    stopBtn.style.display = "inline-block";
     listenBtn.disabled = true;
 
     mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
@@ -35,24 +34,23 @@ startBtn.addEventListener('click', async () => {
       const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
       audioURL = URL.createObjectURL(audioBlob);
 
-      startBtn.disabled = false;
-      stopBtn.style.display = "none";       // إخفاء زر الإيقاف
+      stopBtn.style.display = "none";       // إخفاء زر الإيقاف بعد التوقف
       listenBtn.disabled = false;           // تفعيل زر الاستماع
     };
 
   } catch (error) {
-    alert("المايكروفون غير مسموح! الرجاء تفعيل الإذن.");
+    alert("المايكروفون غير مفعل! الرجاء السماح بالتطبيق.");
   }
 });
 
-// ----------------- إيقاف التسجيل ------------------
+// إيقاف التسجيل
 stopBtn.addEventListener('click', () => {
   if (mediaRecorder && mediaRecorder.state === "recording") {
     mediaRecorder.stop();
   }
 });
 
-// ----------------- الاستماع للتسجيل ------------------
+// الاستماع للتسجيل
 listenBtn.addEventListener('click', () => {
   if (!audioURL) return;
 
@@ -64,13 +62,13 @@ listenBtn.addEventListener('click', () => {
   };
 });
 
-// ----------------- زر نعم ------------------
+// زر نعم
 yesBtn.addEventListener('click', () => {
   resultBox.textContent = "ما شاء الله! تسميعك صحيح 🌸";
   checkPopup.style.display = "none";
 });
 
-// ----------------- زر لا ------------------
+// زر لا
 noBtn.addEventListener('click', () => {
   resultBox.textContent = "كل مرة تعيدي فيها التسميع تقوّي حفظك 💪";
   checkPopup.style.display = "none";
